@@ -5,44 +5,9 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
-tasks.register<Exec>("buildLLVMModule") {
-    doFirst {
-        println("Executing buildLLVMModule task")
-        println("Current directory: ${project.projectDir}")
-        commandLine(
-            "llvm-as",
-            "src/main/llvm/hello_world.ll",
-            "-o",
-            "build/intermediates/llvm/hello_world.bc"
-        )
-    }
-}
-
-tasks.register<Exec>("linkLLVMModule") {
-    doFirst {
-        dependsOn("buildLLVMModule")
-        println("Linking LLVM")
-        commandLine(
-            "llvm-link",
-            "build/intermediates/llvm/hello_world.bc",
-            "-o",
-            "build/intermediates/llvm/hello_world.o",
-            "<path/to/android/libraries>"
-        )
-    }
-}
-
 android {
     namespace = "com.example.llvm_ir_test"
     compileSdk = 34
-
-    afterEvaluate {
-        tasks.withType(Exec::class.java).forEach {
-            if (it.name != "buildLLVMModule" && it.name != "linkLLVMModule") {
-                it.dependsOn("linkLLVMModule")
-            }
-        }
-    }
 
     defaultConfig {
         applicationId = "com.example.llvm_ir_test"
@@ -52,6 +17,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    externalNativeBuild {
+        cmake {
+            path(file("CMakeLists.txt"))
+        }
     }
 
     buildTypes {

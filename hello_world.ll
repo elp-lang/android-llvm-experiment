@@ -1,6 +1,6 @@
 ; ModuleID = 'hello_world.ll'
 target datalayout = "e-m:o-i64:64-f80:128-n8:16:16-S128"
-target triple = "aarch64-android"
+target triple = "x86_64-unknown-android"
 
 ; Include the necessary header
 declare i8* @ANativeWindow_open(i32)
